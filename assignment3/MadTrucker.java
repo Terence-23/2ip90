@@ -1,0 +1,281 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+/**
+ *
+ * Usage:
+ * Program provides an order in which fuel cans should be used in order to avoid
+ * stopping at places where it is forbidden.
+ * Input:
+ * Input consists of space separated positive integers.
+ * First there is a number n signifying the number of cans.
+ * Afterwards there are n can capacities. later the cans are referred to as
+ * indices of cans from 0 to n-1 in the order as provided here.
+ * Lastly there are n-1 positions where it is forbidden to stop. These
+ * locataions are offsets from the start of the trip. It is assumed that the
+ * input contains a sequence of cans and locations for which it is possible to
+ * find a valid path.
+ *
+ * Output:
+ * Space separated indices of cans to be used in order.
+ *
+ *
+ *
+ * @author Jerzy Puchalski
+ * @ID 2253461
+ * @author Kerem Can Ayhan
+ * @ID 2010399
+ *
+ */
+public class MadTrucker {
+    private int n;
+    // private int roadLen;
+    // stored in the form distance, index
+    private HashMap<Integer, Integer> canIndices;
+    private HashSet<Integer> forbiddenLocations;
+    private ArrayList<Integer> mileages;
+    // private ArrayList<Integer> stopSum;
+    private ArrayList<Integer> locations;
+
+    /**
+     * A setup function as required by the problem specification. It assignes
+     * values
+     * of it's parameters to class fields of the same name and produces a HashMap
+     * of
+     * form {can capacity : can index} and a HashSet of all locations where
+     * stopping
+     * is forbidden.
+     *
+     * @param n         number of cans
+     * @param mileages  list of cans
+     * @param locations list of locations where stopping is not allowed
+     */
+    void setup(int n, ArrayList<Integer> mileages, ArrayList<Integer> locations) {
+        this.n = n;
+        this.mileages = mileages;
+        // locations.sort(null);
+        this.locations = locations;
+        canIndices = new HashMap<>();
+        for (int i = 0; i < n; ++i) {
+            canIndices.put(mileages.get(i), i);
+        }
+        forbiddenLocations = new HashSet<>(locations);
+    }
+
+    /**
+     * Stores the edge state. Has a representation for every state for up to 128
+     * different cans. Cans with indicies 128 apart are indistinguishable from each
+     * other for this State object.
+     */
+    private class State {
+        // No need to store position since if the edges are the same so is the distance
+        // int position;
+
+        int[] cans;
+
+        State(HashMap<Integer, Integer> edges, int n) {
+
+            cans = new int[n / 32 + 1];
+            for (int i = 0; i < cans.length; ++i) {
+                cans[i] = 0;
+            }
+
+            for (int v : edges.values()) {
+                int push = v % 32;
+                int ind = v / 32;
+                cans[ind] ^= 1 << push;
+            }
+        }
+
+        private boolean compareTabs(State os) {
+
+            for (int i = 0; i < cans.length; ++i) {
+                if (cans[i] != os.cans[i]) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || o.getClass() != this.getClass()) {
+                return false;
+            }
+            State os = (State) o;
+
+            if (os.cans.length != cans.length) {
+                return false;
+            }
+            return compareTabs(os);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 0;
+            for (int v : cans) {
+                hash ^= v;
+            }
+            return hash;
+        }
+    }
+
+    /**
+     * Boilerplate function to decrease code readability and increase checkstyle
+     * compliance. Should only be called by {@link dfsLikeSolver}.
+     * 
+     * @param position       same as {@link dfsLikeSolver}
+     * @param remainingEdges same as {@link dfsLikeSolver}
+     * @param memo           same as {@link dfsLikeSolver}
+     * @return same as {@link dfsLikeSolver}
+     */
+    ArrayList<Integer> iterate(
+            int position,
+            HashMap<Integer, Integer> remainingEdges,
+            HashSet<State> memo) {
+        for (Map.Entry<Integer, Integer> edge : remainingEdges.entrySet()) {
+            int distance = edge.getKey();
+            int index = edge.getValue();
+            if (forbiddenLocations.contains(position + distance)) {
+                continue;
+            }
+            remainingEdges.remove(distance);
+            ArrayList<Integer> validPath = dfsLikeSolver(
+                    position + distance,
+                    remainingEdges,
+                    memo);
+            remainingEdges.put(distance, index);
+            if (validPath == null) {
+                continue;
+            }
+            validPath.add(index);
+            return validPath;
+        }
+        return null;
+    }
+
+    /**
+     * Searches in a dfs-like manner for a valid path starting at position and
+     * consisting only of remaining edges.
+     *
+     * @param position       distance already travelled
+     * @param remainingEdges remaining gas cans that can be used for travel
+     * @param memo           past visited states for additional pruning
+     * @return valid path (in reverse order) constructed from remaining edges
+     *         starting at position or null if there is no valid path
+     */
+    ArrayList<Integer> dfsLikeSolver(
+            int position,
+            HashMap<Integer, Integer> remainingEdges,
+            HashSet<State> memo) {
+        // the path before this call is valid
+        if (remainingEdges.isEmpty()) {
+            return new ArrayList<>();
+        }
+        // if (forbiddenLocations.contains(position)) {
+        // throw new AssertionError("I am in a forbidden place");
+        // }
+        State now = new State(remainingEdges, n);
+        // if this state has been visited before it doesn't lead anywhere
+        if (memo.contains(now)) {
+            return null;
+        }
+        ArrayList<Integer> path = iterate(position, remainingEdges, memo);
+        if (path == null) {
+            memo.add(now);
+        }
+        // no valid path from this position
+        return path;
+    }
+
+    /**
+     * Boilerplate function required by problem specification. It's main purpose is
+     * reversing the path proveide by the {@link dfsLikeSolver}. Assumes that
+     * {@link setup} has been run already.
+     *
+     * @return Valid Path as list of indices.
+     */
+    ArrayList<Integer> solve() {
+        ArrayList<Integer> path = dfsLikeSolver(0, canIndices, new HashSet<>());
+        Collections.reverse(path);
+        return path;
+    }
+
+    /**
+     * Checks whether a provided solution stops at any forbidden location.
+     *
+     * @param solution the solution provided. It is assumed that the solution
+     *                 contains all the indeces [0,n) where n is the number of fuel
+     *                 cans used.
+     * @return true if the solution is valid (it does not stop at a forbidden
+     *         location) otherwise returns false.
+     */
+    boolean checkSolution(ArrayList<Integer> solution) {
+        int d = 0;
+        int count = 0;
+        for (Integer step : solution) {
+            d += mileages.get(step);
+            count++;
+            // System.out.println("Step number %d, add %d sum %d".formatted(count,
+            // mileages.get(step), d));
+            if (forbiddenLocations.contains(d)) {
+                // System.out.println(
+                // """
+                // Location %d is forbidden. It is the %d location on
+                // this list:%s
+                // cans: %s, forbidden locations: %s"""
+                // .formatted(d,
+                // count,
+                // solution.toString(),
+                // mileages.toString(),
+                // locations.toString()));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Boilerplate function required by problem specification. Handles IO and
+     * delegates setup and solution to respectively {@link setup} and {@link solve}
+     * methods.
+     */
+    void run() {
+        Scanner s = new Scanner(System.in);
+        n = s.nextInt();
+        ArrayList<Integer> cans = new ArrayList<>(n);
+        ArrayList<Integer> blocks = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            cans.add(s.nextInt());
+        }
+        for (int i = 1; i < n; ++i) {
+            blocks.add(s.nextInt());
+        }
+        s.close();
+        setup(n, cans, blocks);
+        ArrayList<Integer> solution = solve();
+        boolean iscorrect = checkSolution(solution);
+        // System.out.println(iscorrect);
+        if (!iscorrect) {
+            throw new AssertionError("the solution is incorrect");
+        }
+        System.out.println(solution.stream().map(String::valueOf).collect(Collectors.joining(" ")));
+    }
+
+    /**
+     * The program entry. Immedietally hands all execution to
+     * {@link run}.
+     *
+     * @param args an array of commandline arguments. entirely ignored by the
+     *             program.
+     */
+    public static void main(String[] args) {
+        new MadTrucker().run();
+    }
+}

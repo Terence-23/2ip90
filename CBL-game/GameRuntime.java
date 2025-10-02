@@ -53,17 +53,19 @@ public class GameRuntime {
         Duration tmp = Duration.between(startTime, Instant.now());
         deltaTime = tmp.getSeconds();
         deltaTime += tmp.getNano() * 1e-9;
+        startTime = Instant.now();
 
         for (GameObject gameObject : objects) {
             gameObject.update();
         }
+        redraw();
     }
 
     /**
      * Draws the window from scratch.
      */
     void redraw() {
-        frame.repaint();
+        canvas.repaint();
     }
 
     public static void main(String[] args) {

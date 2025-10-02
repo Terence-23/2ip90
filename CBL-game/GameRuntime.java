@@ -1,6 +1,12 @@
+import java.awt.Graphics;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 /**
  * The main runtime of the game.
@@ -10,11 +16,15 @@ public class GameRuntime {
     public static GameRuntime rt;
     public double deltaTime;
     Instant startTime;
+    // the drawing area of the game.
+    Graphics g;
 
     ArrayList<GameObject> objects;
+    HashMap<String, CollisionLayer> collisionLayers;
 
     GameRuntime() {
         objects = new ArrayList<>();
+        collisionLayers = new HashMap<>();
     }
 
     /**
@@ -36,7 +46,7 @@ public class GameRuntime {
             gameObject.update();
         }
         for (GameObject gameObject : objects) {
-            gameObject.draw();
+            gameObject.draw(g);
         }
     }
 
@@ -46,12 +56,20 @@ public class GameRuntime {
     void redraw() {
 
         for (GameObject object : objects) {
-            object.draw();
+            object.draw(g);
         }
     }
 
     public static void main(String[] args) {
+        JFrame frame = new JFrame("Game Window");
+        JPanel panel = new JPanel();
+
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        frame.add(panel);
+
         GameRuntime.rt = new GameRuntime();
+        rt.g = panel.getGraphics();
 
         GameRuntime.rt.setup();
 

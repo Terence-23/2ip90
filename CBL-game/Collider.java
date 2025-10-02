@@ -1,5 +1,11 @@
+import java.awt.Graphics;
+
 /**
- * General class for describing objects that can collide.
+ * General class for describing objects that can collide. It's an attempt at a
+ * tagged union from languages like Rust or Haskell. It's non trivial to make it
+ * work using just inheritance because depending on object type there must be
+ * different collision behaviour depending on both the object kind and it's
+ * underlying mathematical representation.
  */
 class Collider {
     /**
@@ -415,7 +421,7 @@ class Collider {
         }
 
         @Override
-        public void draw() {
+        public void draw(Graphics g) {
         }
 
         @Override
@@ -546,6 +552,30 @@ class Collider {
                 return c.collide(ci);
             default:
                 return false;
+        }
+    }
+
+    /**
+     * Returns the {@link GameObject} storeed by the inner type.
+     * 
+     * @return the {@link GameObject}
+     */
+    GameObject getObject() {
+        switch (type) {
+            case Type.Line:
+                Line l = getLine();
+                return l.object;
+            case Type.ClosedLine:
+                ClosedLine cl = getClosedLine();
+                return cl.object;
+            case Type.Quad:
+                Quad q = getQuad();
+                return q.object;
+            case Type.Circle:
+                Circle ci = getCircle();
+                return ci.object;
+            default:
+                return null;
         }
     }
 

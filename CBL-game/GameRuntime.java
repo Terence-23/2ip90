@@ -17,14 +17,24 @@ public class GameRuntime {
     public double deltaTime;
     Instant startTime;
     // the drawing area of the game.
-    Graphics g;
+
+    JFrame frame;
+    GameCanvas canvas;
 
     ArrayList<GameObject> objects;
     HashMap<String, CollisionLayer> collisionLayers;
 
     GameRuntime() {
         objects = new ArrayList<>();
+        frame = new JFrame("Title Pending");
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        canvas = new GameCanvas(objects);
+        frame.add(canvas);
         collisionLayers = new HashMap<>();
+
+        frame.setSize(1280, 720);
+        frame.setVisible(true);
+
     }
 
     /**
@@ -32,6 +42,8 @@ public class GameRuntime {
      */
     void setup() {
         startTime = Instant.now();
+
+        redraw();
     }
 
     /**
@@ -45,31 +57,17 @@ public class GameRuntime {
         for (GameObject gameObject : objects) {
             gameObject.update();
         }
-        for (GameObject gameObject : objects) {
-            gameObject.draw(g);
-        }
     }
 
     /**
      * Draws the window from scratch.
      */
     void redraw() {
-
-        for (GameObject object : objects) {
-            object.draw(g);
-        }
+        frame.repaint();
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Game Window");
-        JPanel panel = new JPanel();
-
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        frame.add(panel);
-
         GameRuntime.rt = new GameRuntime();
-        rt.g = panel.getGraphics();
 
         GameRuntime.rt.setup();
 

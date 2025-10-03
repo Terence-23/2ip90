@@ -33,8 +33,9 @@ public class GameRuntime {
         collisionLayers = new HashMap<>();
 
         frame.setSize(1280, 720);
+        canvas.setDimensions(1280, 720);
         frame.setVisible(true);
-
+        canvas.createBufferStrategy(2);
     }
 
     /**
@@ -42,6 +43,10 @@ public class GameRuntime {
      */
     void setup() {
         startTime = Instant.now();
+
+        for (GameObject gameObject : objects) {
+            gameObject.setup();
+        }
 
         redraw();
     }
@@ -65,7 +70,7 @@ public class GameRuntime {
      * Draws the window from scratch.
      */
     void redraw() {
-        canvas.repaint();
+        canvas.render();
     }
 
     public static void main(String[] args) {

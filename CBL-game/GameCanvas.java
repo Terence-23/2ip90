@@ -1,8 +1,12 @@
 import java.awt.Canvas;
 import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 
 class GameCanvas extends Canvas {
+
+    private int height;
+    private int width;
     private ArrayList<GameObject> objects;
 
     /**
@@ -13,9 +17,41 @@ class GameCanvas extends Canvas {
      *                   facilitate any changing of this array.
      *
      */
+
+    void setDimensions(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
+     * Create a canvas for a list of objects.
+     * 
+     * @param objectList the list of objects.
+     */
     GameCanvas(ArrayList<GameObject> objectList) {
         super();
         objects = objectList;
+    }
+
+    /**
+     * Render the Canvas to screen.
+     */
+    public void render() {
+        BufferStrategy bs = getBufferStrategy();
+        if (bs == null) {
+            createBufferStrategy(2);
+            return;
+        }
+        Graphics g = bs.getDrawGraphics();
+
+        g.setColor(getBackground());
+        g.clearRect(0, 0, width, height);
+
+        g.setColor(getForeground());
+        paint(g);
+
+        g.dispose();
+        bs.show();
     }
 
     /**

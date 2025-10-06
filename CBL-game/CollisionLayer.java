@@ -19,7 +19,7 @@ public class CollisionLayer {
      */
     void collide_with(Collider col) {
         for (Collider collider : colliders) {
-            if (collider.collide(col)) {
+            if (collider.collides(col)) {
                 GameObject o1 = collider.getObject();
                 GameObject o2 = col.getObject();
 

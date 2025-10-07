@@ -21,6 +21,15 @@ class GameCanvas extends Canvas {
     void setDimensions(int width, int height) {
         this.width = width;
         this.height = height;
+        setSize(width, height);
+    }
+
+    int getCanvasWidth() {
+        return width;
+    }
+
+    int getCanvasHeight() {
+        return height;
     }
 
     /**

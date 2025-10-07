@@ -24,7 +24,13 @@ public class Input {
                                 Input.pressed.add(e.getKeyChar());
                                 break;
                             case KeyEvent.KEY_RELEASED:
-                                Input.pressed.remove(e.getKeyChar());
+                                // System.out.println("key released: %s".formatted(e.getKeyChar()));
+                                Input.pressed.remove(Input.pressed.indexOf(e.getKeyChar()));
+                                // System.out.printf("position of %s: %d\n", e.getKeyChar(),
+                                        Input.pressed.indexOf(e.getKeyChar()));
+                                // if (pressed.contains(e.getKeyChar())) {
+                                //     throw new RuntimeException("It contains the removed key");
+                                // }
                                 break;
                             default:
                                 break;

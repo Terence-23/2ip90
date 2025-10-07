@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.time.Duration;
 import java.time.Instant;
@@ -12,6 +13,28 @@ import javax.swing.WindowConstants;
  * The main runtime of the game.
  */
 public class GameRuntime {
+
+    public Player player;
+    // The size of the screen in gamespace;
+    protected Vec2 screenSize = new Vec2(16, 9);
+
+    /**
+     * maps a vector from game space to scren.
+     * 
+     * @param v the Vector to be mapped
+     * @return the mapped vector
+     */
+    public Vec2 map_space_to_screen(Vec2 v) {
+        var playerPos = player.getPos();
+        // System.out.println(playerPos.x);
+        // System.out.println(screenSize.x);
+        var x = (v.x - playerPos.x) / screenSize.x + 0.5;
+        var y = (v.y - playerPos.y) / screenSize.y + 0.5;
+
+        // System.out.println(x);
+        // System.out.println(y);
+        return new Vec2(x * canvas.getCanvasWidth(), y * canvas.getCanvasHeight());
+    }
 
     public static GameRuntime rt;
     public double deltaTime;
@@ -43,6 +66,8 @@ public class GameRuntime {
      */
     void setup() {
         startTime = Instant.now();
+        player = new Player();
+        objects.add(player);
 
         for (GameObject gameObject : objects) {
             gameObject.setup();
@@ -75,13 +100,13 @@ public class GameRuntime {
 
     public static void main(String[] args) {
         GameRuntime.rt = new GameRuntime();
+        Input input = new Input();
+        rt.canvas.setBackground(Color.gray);
 
         GameRuntime.rt.setup();
 
         while (true) {
-            System.out.println("while");
             GameRuntime.rt.update();
-            GameRuntime.rt.redraw();
         }
 
     }

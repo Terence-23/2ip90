@@ -69,7 +69,7 @@ class Player implements GameObject {
         if (Double.isNaN(pos.x)) {
             throw new RuntimeException("pos became nan");
         }
-        System.out.println("Position: %f,%f".formatted(pos.x, pos.y));
+        // System.out.println("Position: %f,%f".formatted(pos.x, pos.y));
     }
 
 }

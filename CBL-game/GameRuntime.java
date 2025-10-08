@@ -36,6 +36,10 @@ public class GameRuntime {
         return new Vec2(x * canvas.getCanvasWidth(), y * canvas.getCanvasHeight());
     }
 
+    void gameOver() {
+        throw new UnsupportedOperationException("this feature is not yet implemented");
+    }
+
     public static GameRuntime rt;
     public double deltaTime;
     Instant startTime;

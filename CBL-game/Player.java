@@ -6,6 +6,8 @@ class Player implements GameObject {
     Vec2 pos;
     static final double SPEED = 2.;
     static final Color COLOR = Color.blue;
+    static final double MAX_HEALTH = 100;
+    double health;
 
     @Override
     public Vec2 getPos() {
@@ -15,6 +17,7 @@ class Player implements GameObject {
     @Override
     public void setup() {
         pos = new Vec2(0, 0);
+        health = MAX_HEALTH;
     }
 
     @Override
@@ -27,7 +30,15 @@ class Player implements GameObject {
 
         g.setColor(COLOR);
         g.fillRect((int) startCorner.x, (int) startCorner.y, (int) size.x, (int) size.y);
+        g.drawString("HP: %d".formatted((int) health), 10, 20);
 
+    }
+
+    public void damage(double dmg) {
+        health -= dmg;
+        if (health <= 0) {
+            GameRuntime.rt.gameOver();
+        }
     }
 
     @Override

@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics;
 
+import javax.swing.SwingUtilities;
+
 class Player implements GameObject {
 
     Vec2 pos;
@@ -8,6 +10,7 @@ class Player implements GameObject {
     static final Color COLOR = Color.blue;
     static final double MAX_HEALTH = 100;
     double health;
+    boolean setup = false;
 
     @Override
     public Vec2 getPos() {
@@ -18,6 +21,7 @@ class Player implements GameObject {
     public void setup() {
         pos = new Vec2(0, 0);
         health = MAX_HEALTH;
+        setup = true;
     }
 
     @Override
@@ -43,6 +47,9 @@ class Player implements GameObject {
 
     @Override
     public void update() {
+        if (!setup) {
+            return;
+        }
         GameRuntime rt = GameRuntime.rt;
         if (Double.isNaN(pos.x)) {
             throw new RuntimeException("pos is nan");

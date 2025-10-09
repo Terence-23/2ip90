@@ -3,10 +3,14 @@ import java.awt.Graphics;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 /**
@@ -17,6 +21,8 @@ public class GameRuntime {
     public Player player;
     // The size of the screen in gamespace;
     protected Vec2 screenSize = new Vec2(16, 9);
+    boolean started = false;
+    Executor renderer = Executors.newSingleThreadExecutor();
 
     /**
      * maps a vector from game space to scren.
@@ -37,7 +43,26 @@ public class GameRuntime {
     }
 
     void gameOver() {
-        throw new UnsupportedOperationException("this feature is not yet implemented");
+        startTime = null;
+        started = false;
+        // throw new UnsupportedOperationException("this feature is not yet
+        // implemented");
+        synchronized (canvas) {
+            objects.remove(player);
+            SwingUtilities.invokeLater(() -> {
+                gOver = new GameOver();
+                frame.getContentPane().remove(canvas);
+                frame.getContentPane().remove(panel);
+                if (!Arrays.asList(frame.getContentPane().getComponents()).contains(panel)) {
+                    frame.getContentPane().add(gOver);
+                }
+
+                frame.revalidate();
+                frame.repaint();
+                System.out.println("gover");
+                System.out.println("Current components: " + Arrays.toString(frame.getContentPane().getComponents()));
+            });
+        }
     }
 
     public static GameRuntime rt;
@@ -47,8 +72,13 @@ public class GameRuntime {
 
     JFrame frame;
     GameCanvas canvas;
+    GameStart start = new GameStart();
+    GamePanel panel;
+    GameOver gOver = new GameOver();
+    private ArrayList<GameObject> addQue = new ArrayList<>();
+    private ArrayList<GameObject> delQue = new ArrayList<>();
 
-    ArrayList<GameObject> objects;
+    private ArrayList<GameObject> objects;
     HashMap<String, CollisionLayer> collisionLayers;
 
     GameRuntime() {
@@ -56,20 +86,46 @@ public class GameRuntime {
         frame = new JFrame("Title Pending");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         canvas = new GameCanvas(objects);
-        frame.add(canvas);
         collisionLayers = new HashMap<>();
+        frame.getContentPane().add(start);
+        // frame.add(canvas);
 
         frame.setSize(1280, 720);
-        canvas.setDimensions(1280, 720);
         frame.setVisible(true);
-        canvas.createBufferStrategy(2);
+    }
+
+    void add(GameObject o) {
+        synchronized (addQue) {
+            addQue.add(o);
+        }
+    }
+
+    void remove(GameObject o) {
+        o.onDestroy();
+        synchronized (delQue) {
+            delQue.add(o);
+        }
     }
 
     /**
      * Executes only once at the beginning of the game.
      */
     void setup() {
+        started = true;
         startTime = Instant.now();
+        frame.remove(gOver);
+        panel = new GamePanel();
+        panel.add(canvas);
+
+        frame.getContentPane().remove(start);
+        frame.getContentPane().remove(gOver);
+        frame.getContentPane().add(panel);
+
+        frame.revalidate();
+        frame.repaint();
+
+        canvas.setDimensions(1280, 720);
+        canvas.createBufferStrategy(2);
         player = new Player();
         objects.add(player);
 
@@ -77,21 +133,53 @@ public class GameRuntime {
             gameObject.setup();
         }
 
-        redraw();
+        synchronized (canvas) {
+            if (!canvas.isDisplayable()) {
+                return;
+            }
+            redraw();
+        }
+
     }
 
     /**
      * Executes repeatedly.
      */
     void update() {
+        synchronized (objects) {
+            synchronized (addQue) {
+                for (GameObject o : addQue) {
+                    objects.add(o);
+                }
+            }
+            synchronized (delQue) {
+                for (GameObject o : addQue) {
+                    objects.remove(o);
+                }
+            }
+
+        }
+        if (!started) {
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+            }
+            return;
+        }
         Duration tmp = Duration.between(startTime, Instant.now());
         deltaTime = tmp.getSeconds();
         deltaTime += tmp.getNano() * 1e-9;
+
         startTime = Instant.now();
+        // for testing only
+        if (Input.isKeyPressed('o')) {
+            player.damage(deltaTime * 100);
+        }
 
         for (GameObject gameObject : objects) {
             gameObject.update();
         }
+
         redraw();
     }
 
@@ -99,7 +187,11 @@ public class GameRuntime {
      * Draws the window from scratch.
      */
     void redraw() {
-        canvas.render();
+        if (canvas.clean) {
+            canvas.clean = false;
+            renderer.execute(canvas);
+        }
+
     }
 
     public static void main(String[] args) {
@@ -107,7 +199,7 @@ public class GameRuntime {
         Input input = new Input();
         rt.canvas.setBackground(Color.gray);
 
-        GameRuntime.rt.setup();
+        // GameRuntime.rt.setup();
 
         while (true) {
             GameRuntime.rt.update();

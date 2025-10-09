@@ -2,12 +2,13 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Class fro handling input. Knows which keys are pressed.
  */
 public class Input {
-    private static ArrayList<Character> pressed = new ArrayList<>();
+    private static HashSet<Character> pressed = new HashSet<>();
 
     /**
      * Needed before any input actions are checked. Sets up the event listener.
@@ -25,7 +26,7 @@ public class Input {
                                 break;
                             case KeyEvent.KEY_RELEASED:
                                 // System.out.println("key released: %s".formatted(e.getKeyChar()));
-                                Input.pressed.remove(Input.pressed.indexOf(e.getKeyChar()));
+                                Input.pressed.remove(e.getKeyChar());
                                 // System.out.printf("position of %s: %d\n", e.getKeyChar(),
                                 // Input.pressed.indexOf(e.getKeyChar()));
                                 // if (pressed.contains(e.getKeyChar())) {

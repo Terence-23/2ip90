@@ -3,11 +3,12 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 
-class GameCanvas extends Canvas {
+class GameCanvas extends Canvas implements Runnable {
 
     private int height;
     private int width;
     private ArrayList<GameObject> objects;
+    public boolean clean = true;
 
     /**
      * A Canvas for drawing all the in game objects. It should fill the main JFrame.
@@ -45,14 +46,19 @@ class GameCanvas extends Canvas {
     /**
      * Render the Canvas to screen.
      */
-    public void render() {
+    public synchronized void render() {
         BufferStrategy bs = getBufferStrategy();
         if (bs == null) {
             createBufferStrategy(2);
             return;
         }
-        Graphics g = bs.getDrawGraphics();
+        Graphics g;
 
+        try {
+            g = bs.getDrawGraphics();
+        } catch (IllegalStateException e) {
+            return;
+        }
         g.setColor(getBackground());
         g.clearRect(0, 0, width, height);
 
@@ -61,6 +67,11 @@ class GameCanvas extends Canvas {
 
         g.dispose();
         bs.show();
+    }
+
+    public void run() {
+        render();
+        clean = true;
     }
 
     /**

@@ -58,12 +58,14 @@ class Bullet implements GameObject {
     public void update() {
         // System.out.println("update bullet");
         position = position.add(velocity.mul(GameRuntime.rt.deltaTime));
+        GameRuntime.rt.collisionLayers.get("Enemies").collide_with(this.collider);
     }
 
     @Override
     public void onCollide(GameObject oth) {
         if (oth instanceof Enemy) {
             ((Enemy) oth).damage(damage);
+            GameRuntime.rt.remove(this);
         }
     }
 

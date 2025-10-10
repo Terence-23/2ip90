@@ -8,6 +8,9 @@ public interface GameObject {
 
     void setup();
 
+    /**
+     * objects should during drawing also remove their artifacts.
+     */
     void draw(Graphics g);
 
     void update();

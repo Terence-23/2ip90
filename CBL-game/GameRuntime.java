@@ -1,5 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class GameRuntime {
 
     public Player player;
     // The size of the screen in gamespace;
-    protected Vec2 screenSize = new Vec2(16, 9);
+    protected Vec2 screenSize = new Vec2(64, 36);
     boolean started = false;
     Executor renderer = Executors.newSingleThreadExecutor();
 
@@ -39,7 +41,7 @@ public class GameRuntime {
 
         // System.out.println(x);
         // System.out.println(y);
-        return new Vec2(x * canvas.getCanvasWidth(), y * canvas.getCanvasHeight());
+        return new Vec2(x * canvas.getWidth(), y * canvas.getHeight());
     }
 
     void gameOver() {
@@ -47,8 +49,8 @@ public class GameRuntime {
         started = false;
         // throw new UnsupportedOperationException("this feature is not yet
         // implemented");
-        synchronized (canvas) {
-            objects.remove(player);
+        synchronized (objects) {
+            objects.clear();
             SwingUtilities.invokeLater(() -> {
                 gOver = new GameOver();
                 frame.getContentPane().remove(canvas);
@@ -101,7 +103,6 @@ public class GameRuntime {
     }
 
     void remove(GameObject o) {
-        o.onDestroy();
         synchronized (delQue) {
             delQue.add(o);
         }
@@ -124,7 +125,7 @@ public class GameRuntime {
         frame.revalidate();
         frame.repaint();
 
-        canvas.setDimensions(1280, 720);
+        // canvas.setDimensions(1280, 720);
         canvas.createBufferStrategy(2);
         player = new Player();
         objects.add(player);
@@ -149,13 +150,17 @@ public class GameRuntime {
         synchronized (objects) {
             synchronized (addQue) {
                 for (GameObject o : addQue) {
+                    System.out.println("object added");
                     objects.add(o);
                 }
+                addQue.clear();
             }
             synchronized (delQue) {
-                for (GameObject o : addQue) {
+                for (GameObject o : delQue) {
+                    o.onDestroy();
                     objects.remove(o);
                 }
+                delQue.clear();
             }
 
         }
@@ -197,6 +202,15 @@ public class GameRuntime {
     public static void main(String[] args) {
         GameRuntime.rt = new GameRuntime();
         Input input = new Input();
+        rt.canvas.addMouseListener(input);
+        rt.canvas.addMouseMotionListener(input);
+        rt.canvas.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+
+                rt.canvas.setDimensions(rt.canvas.getWidth(), rt.canvas.getHeight());
+            }
+        });
         rt.canvas.setBackground(Color.gray);
 
         // GameRuntime.rt.setup();

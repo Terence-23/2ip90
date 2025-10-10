@@ -26,11 +26,11 @@ class GameCanvas extends Canvas implements Runnable {
     }
 
     int getCanvasWidth() {
-        return width;
+        return getWidth();
     }
 
     int getCanvasHeight() {
-        return height;
+        return getHeight();
     }
 
     /**
@@ -47,20 +47,21 @@ class GameCanvas extends Canvas implements Runnable {
      * Render the Canvas to screen.
      */
     public synchronized void render() {
-        BufferStrategy bs = getBufferStrategy();
-        if (bs == null) {
-            createBufferStrategy(2);
-            return;
-        }
-        Graphics g;
 
+        BufferStrategy bs;
+        Graphics g;
         try {
+            bs = getBufferStrategy();
+            if (bs == null) {
+                createBufferStrategy(2);
+                return;
+            }
             g = bs.getDrawGraphics();
         } catch (IllegalStateException e) {
             return;
         }
         g.setColor(getBackground());
-        g.clearRect(0, 0, width, height);
+        // g.clearRect(0, 0, width, height);
 
         g.setColor(getForeground());
         paint(g);
@@ -80,8 +81,10 @@ class GameCanvas extends Canvas implements Runnable {
      * @param g the Graphics object used for the painting
      */
     public void paint(Graphics g) {
-        for (GameObject o : objects) {
-            o.draw(g);
+        synchronized (objects) {
+            for (GameObject o : objects) {
+                o.draw(g);
+            }
         }
     }
 

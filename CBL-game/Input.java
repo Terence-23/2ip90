@@ -1,14 +1,53 @@
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.awt.event.MouseEvent;
 import java.util.HashSet;
+import javax.swing.event.MouseInputListener;
 
 /**
  * Class fro handling input. Knows which keys are pressed.
  */
-public class Input {
+public class Input implements MouseInputListener {
     private static HashSet<Character> pressed = new HashSet<>();
+    private static HashSet<Integer> mousePressed = new HashSet<>();
+    private static Vec2 mousePos = new Vec2(0, 0);
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        System.out.println("mouse pressed");
+        Input.mousePressed.add(e.getButton());
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        System.out.println("mouse released");
+        Input.mousePressed.remove(e.getButton());
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        Input.mousePos.x = e.getX();
+        Input.mousePos.y = e.getY();
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        Input.mousePos.x = e.getX();
+        Input.mousePos.y = e.getY();
+    }
 
     /**
      * Needed before any input actions are checked. Sets up the event listener.
@@ -25,13 +64,7 @@ public class Input {
                                 Input.pressed.add(e.getKeyChar());
                                 break;
                             case KeyEvent.KEY_RELEASED:
-                                // System.out.println("key released: %s".formatted(e.getKeyChar()));
                                 Input.pressed.remove(e.getKeyChar());
-                                // System.out.printf("position of %s: %d\n", e.getKeyChar(),
-                                // Input.pressed.indexOf(e.getKeyChar()));
-                                // if (pressed.contains(e.getKeyChar())) {
-                                // throw new RuntimeException("It contains the removed key");
-                                // }
                                 break;
                             default:
                                 break;
@@ -41,10 +74,19 @@ public class Input {
 
                     }
                 });
+
     }
 
     public static boolean isKeyPressed(Character k) {
         return pressed.contains(k);
+    }
+
+    public static boolean isMousePressed(int b) {
+        return mousePressed.contains(b);
+    }
+
+    public static Vec2 getMousePos() {
+        return mousePos;
     }
 
 }

@@ -1,16 +1,25 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.MouseInfo;
+import java.awt.Rectangle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.SwingUtilities;
 
 class Player implements GameObject {
 
     Vec2 pos;
+    double bulletDamage = 10;
+    double bulletSpeed = 10;
+    double bulletInterval = 0.1;
+    double timeSinceLastBullet = bulletInterval;
     static final double SPEED = 2.;
     static final Color COLOR = Color.blue;
     static final double MAX_HEALTH = 100;
     double health;
     boolean setup = false;
+    Rectangle lastDraw;
 
     @Override
     public Vec2 getPos() {
@@ -32,8 +41,18 @@ class Player implements GameObject {
 
         var size = endCorner.sub(startCorner);
 
+        if (lastDraw != null) {
+            g.clearRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
+        }
+        Rectangle rect = new Rectangle(
+                (int) startCorner.x,
+                (int) startCorner.y,
+                (int) size.x,
+                (int) size.y);
+        lastDraw = rect;
+
         g.setColor(COLOR);
-        g.fillRect((int) startCorner.x, (int) startCorner.y, (int) size.x, (int) size.y);
+        g.fillRect(rect.x, rect.y, rect.width, rect.height);
         g.drawString("HP: %d".formatted((int) health), 10, 20);
 
     }
@@ -76,7 +95,38 @@ class Player implements GameObject {
         if (Double.isNaN(pos.x)) {
             throw new RuntimeException("pos became nan");
         }
+        if (Input.isMousePressed(1) && timeSinceLastBullet > bulletInterval) {
+            shootBullet();
+            timeSinceLastBullet = 0;
+        }
+        timeSinceLastBullet += rt.deltaTime;
         // System.out.println("Position: %f,%f".formatted(pos.x, pos.y));
+    }
+
+    void shootBullet() {
+        var rt = GameRuntime.rt;
+
+        var mousePos = Input.getMousePos();
+
+        var bounds = rt.canvas.getBounds();
+        var centerx = bounds.x + bounds.width * 0.5;
+        var centery = bounds.y + bounds.height * 0.5;
+        var dir = new Vec2(mousePos.x - centerx, mousePos.y - centery);
+        if (dir.x == 0 && dir.y == 0) {
+            dir = new Vec2(1, 0);
+        }
+        var velocity = dir.unit().mul(bulletSpeed);
+
+        Bullet bullet = new Bullet(bulletDamage, pos, velocity);
+        rt.add(bullet);
+        new Timer().schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                rt.remove(bullet);
+            }
+
+        }, 3000);
     }
 
 }

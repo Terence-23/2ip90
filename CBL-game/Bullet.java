@@ -59,7 +59,6 @@ class Bullet implements GameObject {
         // System.out.println("update bullet");
         position = position.add(velocity.mul(GameRuntime.rt.deltaTime));
         GameRuntime.rt.collisionLayers.get("Enemies").collide_with(this.collider);
-
     }
 
     @Override

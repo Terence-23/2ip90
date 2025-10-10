@@ -201,6 +201,7 @@ public class GameRuntime {
 
     public static void main(String[] args) {
         GameRuntime.rt = new GameRuntime();
+        rt.collisionLayers.put("Enemies", new CollisionLayer());
         Input input = new Input();
         rt.canvas.addMouseListener(input);
         rt.canvas.addMouseMotionListener(input);

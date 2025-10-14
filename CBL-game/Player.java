@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.MouseInfo;
 import java.awt.Rectangle;
@@ -20,6 +21,7 @@ class Player implements GameObject {
     double health;
     boolean setup = false;
     Rectangle lastDraw;
+    String lastHPString;
 
     @Override
     public Vec2 getPos() {
@@ -53,14 +55,26 @@ class Player implements GameObject {
 
         g.setColor(COLOR);
         g.fillRect(rect.x, rect.y, rect.width, rect.height);
-        g.drawString("HP: %d".formatted((int) health), 10, 20);
+
+        var metrics = g.getFontMetrics();
+
+        if (lastHPString != null) {
+            g.clearRect(9, 19 - metrics.getAscent(), metrics.stringWidth(lastHPString) + 2, metrics.getHeight() + 2);
+        }
+
+        lastHPString = "HP: %d".formatted((int) health);
+
+        g.drawString(lastHPString, 10, 20);
 
     }
 
     public void damage(double dmg) {
         health -= dmg;
         if (health <= 0) {
-            GameRuntime.rt.gameOver();
+            SwingUtilities.invokeLater(() -> {
+                GameRuntime.rt.gameOver();
+            });
+
         }
     }
 

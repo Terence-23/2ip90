@@ -75,11 +75,14 @@ class Bullet implements GameObject {
     public void onDestroy() {
 
         if (lastDraw != null) {
-            var bs = GameRuntime.rt.canvas.getBufferStrategy();
-            var g = bs.getDrawGraphics();
-            g.clearRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
-            g.dispose();
-            bs.show();
+            try {
+                var bs = GameRuntime.rt.canvas.getBufferStrategy();
+                var g = bs.getDrawGraphics();
+                g.clearRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
+                g.dispose();
+                bs.show();
+            } catch (Exception e) {
+            }
         }
 
         System.out.println("bullet destroyed");

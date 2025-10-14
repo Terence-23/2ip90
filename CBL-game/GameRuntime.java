@@ -52,19 +52,17 @@ public class GameRuntime {
         // implemented");
         synchronized (objects) {
             objects.clear();
-            SwingUtilities.invokeLater(() -> {
-                gOver = new GameOver();
-                frame.getContentPane().remove(canvas);
-                frame.getContentPane().remove(panel);
-                if (!Arrays.asList(frame.getContentPane().getComponents()).contains(panel)) {
-                    frame.getContentPane().add(gOver);
-                }
+            gOver = new GameOver();
+            frame.getContentPane().remove(canvas);
+            frame.getContentPane().remove(panel);
+            if (!Arrays.asList(frame.getContentPane().getComponents()).contains(panel)) {
+                frame.getContentPane().add(gOver);
+            }
 
-                frame.revalidate();
-                frame.repaint();
-                System.out.println("gover");
-                System.out.println("Current components: " + Arrays.toString(frame.getContentPane().getComponents()));
-            });
+            frame.revalidate();
+            frame.repaint();
+            System.out.println("gover");
+            System.out.println("Current components: " + Arrays.toString(frame.getContentPane().getComponents()));
         }
     }
 

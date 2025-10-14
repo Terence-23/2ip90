@@ -11,6 +11,10 @@ public class CollisionLayer {
         colliders.add(col);
     }
 
+    void remove(Collider col) {
+        colliders.remove(col);
+    }
+
     /**
      * checks whether obejcts on the layer collide with given collider. Executes on
      * hit callback.

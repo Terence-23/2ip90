@@ -21,12 +21,15 @@ class Enemy implements GameObject {
 
     @Override
     public void onDestroy() {
-
+        var layer = GameRuntime.rt.collisionLayers.get("Enemies");
+        if (layer != null) {
+            layer.remove(this.col);
+        }
         if (lastDraw != null) {
             var bs = GameRuntime.rt.canvas.getBufferStrategy();
             var g = bs.getDrawGraphics();
 
-            g.clearRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
+            g.clearRect(lastDraw.x - 1, lastDraw.y - 1, lastDraw.width + 2, lastDraw.height + 2);
 
             g.dispose();
             bs.show();
@@ -58,7 +61,7 @@ class Enemy implements GameObject {
         var rt = GameRuntime.rt;
         final var CORNER_OFFSET = size.mul(0.5);
         if (lastDraw != null) {
-            g.clearRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
+            g.clearRect(lastDraw.x - 1, lastDraw.y - 1, lastDraw.width + 2, lastDraw.height + 2);
         }
 
         Vec2 startPos = rt.map_space_to_screen(pos.sub(CORNER_OFFSET));
@@ -70,6 +73,8 @@ class Enemy implements GameObject {
                 (int) endPos.y - (int) startPos.y);
         g.setColor(Color.red);
         g.fillRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
+        g.setColor(Color.black);
+        g.drawRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
     }
 
     @Override

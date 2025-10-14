@@ -21,6 +21,7 @@ import javax.swing.WindowConstants;
 public class GameRuntime {
 
     public Player player;
+    private EnemySpawner spawner;
     // The size of the screen in gamespace;
     protected Vec2 screenSize = new Vec2(64, 36);
     boolean started = false;
@@ -127,10 +128,13 @@ public class GameRuntime {
         // canvas.setDimensions(1280, 720);
         canvas.createBufferStrategy(2);
         player = new Player();
+        spawner = new EnemySpawner();
+
+        objects.add(spawner);
         objects.add(player);
 
-        var enemy = new Enemy(new Vec2(12, 12));
-        objects.add(enemy);
+        // var enemy = new Enemy(new Vec2(12, 12));
+        // objects.add(enemy);
 
         for (GameObject gameObject : objects) {
             gameObject.setup();

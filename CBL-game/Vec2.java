@@ -6,6 +6,11 @@ public class Vec2 {
     public double x;
     public double y;
 
+    @Override
+    public String toString() {
+        return "%f, %f".formatted(x, y);
+    }
+
     Vec2(double x, double y) {
         this.x = x;
         this.y = y;

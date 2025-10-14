@@ -18,7 +18,9 @@ public class CollisionLayer {
      * @param col the collide rto be checked against the layer.
      */
     void collide_with(Collider col) {
+        // System.err.println(col);
         for (Collider collider : colliders) {
+            // System.err.println(collider);
             if (collider.collides(col)) {
                 GameObject o1 = collider.getObject();
                 GameObject o2 = col.getObject();

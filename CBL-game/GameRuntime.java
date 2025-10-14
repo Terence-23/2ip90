@@ -112,7 +112,6 @@ public class GameRuntime {
      * Executes only once at the beginning of the game.
      */
     void setup() {
-        started = true;
         startTime = Instant.now();
         frame.remove(gOver);
         panel = new GamePanel();
@@ -130,6 +129,9 @@ public class GameRuntime {
         player = new Player();
         objects.add(player);
 
+        var enemy = new Enemy(new Vec2(12, 12));
+        objects.add(enemy);
+
         for (GameObject gameObject : objects) {
             gameObject.setup();
         }
@@ -141,16 +143,18 @@ public class GameRuntime {
             redraw();
         }
 
+        started = true;
     }
 
     /**
      * Executes repeatedly.
      */
-    void update() {
+    synchronized void update() {
+
         synchronized (objects) {
             synchronized (addQue) {
                 for (GameObject o : addQue) {
-                    System.out.println("object added");
+                    o.setup();
                     objects.add(o);
                 }
                 addQue.clear();
@@ -158,8 +162,8 @@ public class GameRuntime {
             synchronized (delQue) {
                 for (GameObject o : delQue) {
                     o.onDestroy();
-                    objects.remove(o);
                 }
+                objects.removeAll(delQue);
                 delQue.clear();
             }
 

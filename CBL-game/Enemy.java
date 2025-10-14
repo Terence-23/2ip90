@@ -26,13 +26,16 @@ class Enemy implements GameObject {
             layer.remove(this.col);
         }
         if (lastDraw != null) {
-            var bs = GameRuntime.rt.canvas.getBufferStrategy();
-            var g = bs.getDrawGraphics();
+            try {
+                var bs = GameRuntime.rt.canvas.getBufferStrategy();
+                var g = bs.getDrawGraphics();
 
-            g.clearRect(lastDraw.x - 1, lastDraw.y - 1, lastDraw.width + 2, lastDraw.height + 2);
+                g.clearRect(lastDraw.x - 1, lastDraw.y - 1, lastDraw.width + 2, lastDraw.height + 2);
 
-            g.dispose();
-            bs.show();
+                g.dispose();
+                bs.show();
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -77,7 +80,57 @@ class Enemy implements GameObject {
         g.drawRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
     }
 
+    final double speed = 3;
+    private static final double minDistance = 1;
+    private static final double slowDistance = 3;
+
+    /**
+     * Linearly interpolates position between min and max.
+     *
+     * @param min      minimum position
+     * @param max      maximum position
+     * @param position interpolation parameter
+     * @param iValue   multiplier for the final value
+     * @return if position < min return 0, if position > max return iValue else
+     *         return linear interpolation between 0 and iValue
+     */
+    double lerp(double min, double max, double position, double iValue) {
+        var correctedPosition = (position - min) / (max - min);
+        return Math.clamp(correctedPosition, 0, 1) * iValue;
+
+    }
+
+    void trackPlayer() {
+        var player = GameRuntime.rt.player;
+        var offset = player.getPos().sub(getPos());
+        var distance = offset.length();
+        var dir = offset.div(distance);
+
+        var specificSpeed = lerp(minDistance, slowDistance, distance, speed);
+        var velocity = dir.mul(specificSpeed);
+
+        this.pos = this.pos.add(velocity.mul(GameRuntime.rt.deltaTime));
+    }
+
+    final double damageVal = 10;
+    final double attack_range = 3;
+    double timeSinceLastDamage = 10;
+    double damageInterval = 0.5;
+
+    void attackPlayer() {
+        timeSinceLastDamage += GameRuntime.rt.deltaTime;
+        var player = GameRuntime.rt.player;
+        var offset = player.getPos().sub(getPos());
+        var distance = offset.length();
+        if (distance <= attack_range && timeSinceLastDamage > damageInterval) {
+            player.damage(damageVal);
+            timeSinceLastDamage = 0;
+        }
+    }
+
     @Override
     public void update() {
+        trackPlayer();
+        attackPlayer();
     }
 }

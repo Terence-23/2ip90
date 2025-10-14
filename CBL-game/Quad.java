@@ -9,6 +9,15 @@ public class Quad implements Collider {
     Vec2 v;
     GameObject object;
 
+    @Override
+    public String toString() {
+        return """
+                Quad:
+                origin: %s,
+                u: %s,
+                v: %s""".formatted(getOrigin().toString(), u.toString(), v.toString());
+    }
+
     Vec2 getOrigin() {
         return origin.add(object.getPos());
     }
@@ -50,7 +59,7 @@ public class Quad implements Collider {
 
         Vec2 movedOrigin = v.sub(getOrigin());
         double normalLength = u.cross(this.v);
-        // Check if the circle origin is in the quadrilateral
+        // Check if the point is in the quadrilateral
         var upos = movedOrigin.cross(this.v);
         var vpos = u.cross(movedOrigin);
         // System.out.println("Check point in quad");

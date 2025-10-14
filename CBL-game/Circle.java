@@ -1,6 +1,14 @@
 
 public class Circle implements Collider {
 
+    @Override
+    public String toString() {
+        return """
+                Circle:
+                origin: %s
+                radius: %f""".formatted(getOrigin().toString(), radius);
+    }
+
     /**
      * checks whether a circle intersects with a quad bounds.
      * 
@@ -68,8 +76,13 @@ public class Circle implements Collider {
      * @return true if they collide else false.
      */
     public boolean collides(Quad q) {
+        // center of circle in quad
+        return q.checkPointIn(getOrigin())
+                // origin of quad in circle
+                || q.getOrigin().sub(getOrigin()).length2() < this.radius * this.radius
+                // one of the bound intersects the circle
+                || checkQuadBounds(this, q);
 
-        return q.checkPointIn(getOrigin()) || checkQuadBounds(this, q);
     }
 
     public boolean collides(Line l) {

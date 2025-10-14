@@ -10,7 +10,7 @@ class Bullet implements GameObject {
 
     Rectangle lastDraw;
 
-    Circle collider = new Circle(new Vec2(0, 0), RADIUS);
+    Circle collider = new Circle(new Vec2(0, 0), RADIUS, this);
 
     Bullet(double damage, Vec2 position, Vec2 velocity) {
         // System.out.println("a wild bullet has appeared");
@@ -58,7 +58,9 @@ class Bullet implements GameObject {
     public void update() {
         // System.out.println("update bullet");
         position = position.add(velocity.mul(GameRuntime.rt.deltaTime));
-        GameRuntime.rt.collisionLayers.get("Enemies").collide_with(this.collider);
+        var layer = GameRuntime.rt.collisionLayers.get("Enemies");
+        System.out.println(layer.colliders.size());
+        layer.collide_with(this.collider);
     }
 
     @Override

@@ -57,17 +57,17 @@ class GameCanvas extends Canvas implements Runnable {
                 return;
             }
             g = bs.getDrawGraphics();
+            g.setColor(getBackground());
+            // g.clearRect(0, 0, width, height);
+
+            g.setColor(getForeground());
+            paint(g);
+
+            g.dispose();
+            bs.show();
         } catch (IllegalStateException e) {
             return;
         }
-        g.setColor(getBackground());
-        // g.clearRect(0, 0, width, height);
-
-        g.setColor(getForeground());
-        paint(g);
-
-        g.dispose();
-        bs.show();
     }
 
     public void run() {

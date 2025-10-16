@@ -15,7 +15,7 @@ class Player implements GameObject {
     double bulletSpeed = 10;
     double bulletInterval = 0.1;
     double timeSinceLastBullet = bulletInterval;
-    static final double SPEED = 2.;
+    double SPEED = 2.;
     static final Color COLOR = Color.blue;
     static final double MAX_HEALTH = 100;
     double health;
@@ -62,7 +62,7 @@ class Player implements GameObject {
             g.clearRect(9, 19 - metrics.getAscent(), metrics.stringWidth(lastHPString) + 2, metrics.getHeight() + 2);
         }
 
-        lastHPString = "HP: %d".formatted((int) health);
+        lastHPString = "HP: %d DMG: %d".formatted((int) health, (int) bulletDamage);
 
         g.drawString(lastHPString, 10, 20);
 

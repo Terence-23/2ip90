@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.util.Random;
 
 class Enemy implements GameObject {
     static double max_health = 50;
@@ -8,6 +9,12 @@ class Enemy implements GameObject {
     double health = max_health;
     Rectangle lastDraw;
     final Vec2 size = new Vec2(1, 1);
+    static final double UPGRADE_CHANCE = 0.3;
+    static final Upgrade[] POSSIBLE_UPGRADES = new Upgrade[] {
+            new DamageUpgrade(),
+            new SpeedUpgrade(),
+            new HealUpgrade(),
+    };
     Collider col = new Quad(size.mul(-0.5), new Vec2(size.x, 0), new Vec2(0, size.y), this);
 
     Enemy(Vec2 pos) {
@@ -30,12 +37,22 @@ class Enemy implements GameObject {
                 var bs = GameRuntime.rt.canvas.getBufferStrategy();
                 var g = bs.getDrawGraphics();
 
-                g.clearRect(lastDraw.x - 1, lastDraw.y - 1, lastDraw.width + 2, lastDraw.height + 2);
+                g.clearRect(
+                        lastDraw.x - 1,
+                        lastDraw.y - 1,
+                        lastDraw.width + 2,
+                        lastDraw.height + 2);
 
                 g.dispose();
                 bs.show();
             } catch (Exception e) {
             }
+        }
+        var rng = new Random();
+        if (rng.nextDouble() < UPGRADE_CHANCE) {
+            var upgrade = POSSIBLE_UPGRADES[rng.nextInt(POSSIBLE_UPGRADES.length)];
+            GameRuntime.rt.add(new UpgradeObject((Upgrade) (upgrade.clone()), getPos()));
+
         }
     }
 

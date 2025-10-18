@@ -62,7 +62,8 @@ public class GameRuntime {
             frame.revalidate();
             frame.repaint();
             System.out.println("gover");
-            System.out.println("Current components: " + Arrays.toString(frame.getContentPane().getComponents()));
+            // System.out.println("Current components: " +
+            // Arrays.toString(frame.getContentPane().getComponents()));
         }
     }
 
@@ -187,8 +188,10 @@ public class GameRuntime {
             player.damage(deltaTime * 100);
         }
 
-        for (GameObject gameObject : objects) {
-            gameObject.update();
+        synchronized (objects) {
+            for (GameObject gameObject : objects) {
+                gameObject.update();
+            }
         }
 
         redraw();

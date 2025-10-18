@@ -27,13 +27,13 @@ public class Input implements MouseInputListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        System.out.println("mouse pressed");
+        // System.out.println("mouse pressed");
         Input.mousePressed.add(e.getButton());
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("mouse released");
+        // System.out.println("mouse released");
         Input.mousePressed.remove(e.getButton());
     }
 

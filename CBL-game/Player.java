@@ -15,7 +15,7 @@ class Player implements GameObject {
     double bulletSpeed = 10;
     double bulletInterval = 0.1;
     double timeSinceLastBullet = bulletInterval;
-    double SPEED = 2.;
+    double SPEED = 4.;
     static final Color COLOR = Color.blue;
     static final double MAX_HEALTH = 100;
     double health;

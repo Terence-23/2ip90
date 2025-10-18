@@ -23,7 +23,7 @@ class Enemy implements GameObject {
 
     @Override
     public void onCollide(GameObject oth) {
-        System.out.println("enemy ouch");
+        // System.out.println("enemy ouch");
     }
 
     @Override
@@ -59,10 +59,10 @@ class Enemy implements GameObject {
     void damage(double damage) {
         health -= damage;
         if (health <= 0) {
-            System.out.println("enemy dead");
+            // System.out.println("enemy dead");
             GameRuntime.rt.remove(this);
         }
-        System.out.println("OUCH!!");
+        // System.out.println("OUCH!!");
     }
 
     @Override
@@ -97,7 +97,7 @@ class Enemy implements GameObject {
         g.drawRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
     }
 
-    final double speed = 3;
+    final double speed = 4.5;
     private static final double minDistance = 1;
     private static final double slowDistance = 3;
 
@@ -132,7 +132,7 @@ class Enemy implements GameObject {
     final double damageVal = 10;
     final double attack_range = 3;
     double timeSinceLastDamage = 10;
-    double damageInterval = 0.5;
+    double damageInterval = 2;
 
     void attackPlayer() {
         timeSinceLastDamage += GameRuntime.rt.deltaTime;

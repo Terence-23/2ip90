@@ -85,6 +85,6 @@ class Bullet implements GameObject {
             }
         }
 
-        System.out.println("bullet destroyed");
+        // System.out.println("bullet destroyed");
     }
 }

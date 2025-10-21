@@ -2,13 +2,15 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.HashSet;
 import javax.swing.event.MouseInputListener;
 
 /**
  * Class fro handling input. Knows which keys are pressed.
  */
-public class Input implements MouseInputListener {
+public class Input implements MouseInputListener, MouseWheelListener {
     private static HashSet<Character> pressed = new HashSet<>();
     private static HashSet<Integer> mousePressed = new HashSet<>();
     private static Vec2 mousePos = new Vec2(0, 0);
@@ -87,6 +89,16 @@ public class Input implements MouseInputListener {
 
     public static Vec2 getMousePos() {
         return mousePos;
+    }
+
+    double zoomPerScroll = 1.1;
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int scrollCount = e.getWheelRotation();
+        // System.out.println("Scroll. Clicks: %d".formatted(scrollCount));
+        GameRuntime.rt.screenVSize *= Math.pow(zoomPerScroll, scrollCount);
+
     }
 
 }

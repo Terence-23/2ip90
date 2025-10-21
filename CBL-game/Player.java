@@ -34,32 +34,36 @@ class Player implements GameObject {
     Animation shootLeft, shootRight;
     Animation deadLeft, deadRight;
     Animation currentAnim;
-    int frameWidth = 32;
-    int frameHeight = 32; // these
-    enum PlayerState { IDLE, WALK, SHOOT, DEAD }
+    int frameWidth = 128;// 32;
+    int frameHeight = 128;// 32; // these
+
+    enum PlayerState {
+        IDLE, WALK, SHOOT, DEAD
+    }
+
     PlayerState currentState = PlayerState.IDLE;
     boolean facingRight = true;
 
     void loadAnimations() {
-    try {
-        // animUp = new Animation(loadFrames("res/walk_up.png"), 150);
-        // animDown = new Animation(loadFrames("res/walk_down.png"), 150);
-        animLeft = new Animation(loadFrames("walk_left.png"), 150);
-        animRight = new Animation(loadFrames("walk_right.png"), 150);
-        currentAnim = animRight; // default looks right
-        idleLeft = new Animation(loadFrames("idle_left.png"), 300);
-        idleRight = new Animation(loadFrames("idle_right.png"), 300);
+        try {
+            // animUp = new Animation(loadFrames("res/walk_up.png"), 150);
+            // animDown = new Animation(loadFrames("res/walk_down.png"), 150);
+            animLeft = new Animation(loadFrames("walk_left.png"), 150);
+            animRight = new Animation(loadFrames("walk_right.png"), 150);
+            currentAnim = animRight; // default looks right
+            idleLeft = new Animation(loadFrames("idle_left.png"), 300);
+            idleRight = new Animation(loadFrames("idle_right.png"), 300);
 
-        shootLeft = new Animation(loadFrames("shoot_left.png"), 100);
-        shootRight = new Animation(loadFrames("shoot_right.png"), 100);
+            shootLeft = new Animation(loadFrames("shoot_left.png"), 100);
+            shootRight = new Animation(loadFrames("shoot_right.png"), 100);
 
-        deadLeft = new Animation(loadFrames("dead_left.png"), 500);
-        deadRight = new Animation(loadFrames("dead_right.png"), 500);
+            deadLeft = new Animation(loadFrames("dead_left.png"), 500);
+            deadRight = new Animation(loadFrames("dead_right.png"), 500);
 
-    } catch (IOException e) {
-        e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 
     BufferedImage[] loadFrames(String path) throws IOException {
         BufferedImage sheet = ImageIO.read(new File(path));
@@ -68,9 +72,18 @@ class Player implements GameObject {
         for (int i = 0; i < frameCount; i++) {
             frames[i] = sheet.getSubimage(i * frameWidth, 0, frameWidth, frameHeight);
         }
+
+        // test save the first image and sheet
+        // try {
+        // ImageIO.write(sheet, "png", new File("testsheet" + path));
+        // ImageIO.write(frames[0], "png", new File("test" + path));
+        //
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+
         return frames;
     }
-
 
     @Override
     public Vec2 getPos() {
@@ -107,7 +120,6 @@ class Player implements GameObject {
         // g.fillRect(rect.x, rect.y, rect.width, rect.height);
         BufferedImage frame = currentAnim.getCurrentFrame();
         g.drawImage(frame, rect.x, rect.y, rect.width, rect.height, null);
-
 
         var metrics = g.getFontMetrics();
 
@@ -159,9 +171,9 @@ class Player implements GameObject {
             facingRight = true;
         }
         // if (movementDirection.x != 0 || movementDirection.y != 0) {
-        //     var deltaPos = movementDirection.unit().mul(SPEED * rt.deltaTime);
-        //     pos.x += deltaPos.x;
-        //     pos.y += deltaPos.y;
+        // var deltaPos = movementDirection.unit().mul(SPEED * rt.deltaTime);
+        // pos.x += deltaPos.x;
+        // pos.y += deltaPos.y;
         // }
         if (movementDirection.x != 0 || movementDirection.y != 0) {
             var deltaPos = movementDirection.unit().mul(SPEED * rt.deltaTime);
@@ -169,13 +181,13 @@ class Player implements GameObject {
             // moved = true; commented this one
             currentState = PlayerState.WALK;
             // anim
-        // Determine direction for animation
-        if (Math.abs(movementDirection.x) > Math.abs(movementDirection.y)) {
-            currentAnim = movementDirection.x > 0 ? animRight : animLeft;
-        }
-        // } else {
-        //     currentAnim = movementDirection.y > 0 ? animDown : animUp;
-        // }
+            // Determine direction for animation
+            if (Math.abs(movementDirection.x) > Math.abs(movementDirection.y)) {
+                currentAnim = movementDirection.x > 0 ? animRight : animLeft;
+            }
+            // } else {
+            // currentAnim = movementDirection.y > 0 ? animDown : animUp;
+            // }
 
         } else {
             currentState = PlayerState.IDLE;
@@ -186,7 +198,7 @@ class Player implements GameObject {
             timeSinceLastBullet = 0;
             currentState = PlayerState.SHOOT;
         }
-        
+
         timeSinceLastBullet += rt.deltaTime;
 
         switch (currentState) {
@@ -212,8 +224,8 @@ class Player implements GameObject {
             throw new RuntimeException("pos became nan");
         }
         // if (Input.isMousePressed(1) && timeSinceLastBullet > bulletInterval) {
-        //     shootBullet();
-        //     timeSinceLastBullet = 0;
+        // shootBullet();
+        // timeSinceLastBullet = 0;
         // }
         // timeSinceLastBullet += rt.deltaTime;
         // System.out.println("Position: %f,%f".formatted(pos.x, pos.y));

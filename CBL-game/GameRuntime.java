@@ -23,7 +23,8 @@ public class GameRuntime {
     public Player player;
     private EnemySpawner spawner;
     // The size of the screen in gamespace;
-    protected Vec2 screenSize = new Vec2(64, 36);
+    // Vec2 screenSize = new Vec2(64, 36);
+    double screenVSize = 36;
     boolean started = false;
     Executor renderer = Executors.newSingleThreadExecutor();
 
@@ -35,10 +36,11 @@ public class GameRuntime {
      */
     public Vec2 map_space_to_screen(Vec2 v) {
         var playerPos = player.getPos();
+        double screenHSize = canvas.getWidth() * screenVSize / canvas.getHeight();
         // System.out.println(playerPos.x);
         // System.out.println(screenSize.x);
-        var x = (v.x - playerPos.x) / screenSize.x + 0.5;
-        var y = (v.y - playerPos.y) / screenSize.y + 0.5;
+        var x = (v.x - playerPos.x) / screenHSize + 0.5;
+        var y = (v.y - playerPos.y) / screenVSize + 0.5;
 
         // System.out.println(x);
         // System.out.println(y);
@@ -214,6 +216,7 @@ public class GameRuntime {
         Input input = new Input();
         rt.canvas.addMouseListener(input);
         rt.canvas.addMouseMotionListener(input);
+        rt.canvas.addMouseWheelListener(input);
         rt.canvas.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {

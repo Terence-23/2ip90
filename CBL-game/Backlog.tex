@@ -51,75 +51,63 @@
 \date{}
 
 \begin{document}
-\section{Authors:}
-Jerzy Puchalski 2253461
-
-Kerem Can Ayhan 2010399
-
-Group 13
 
 \section{Topics:}\label{topics}
 
 \begin{itemize}
 \tightlist
 \item
-  git: 
-    Each backlog item has a dedicated issue on github that allows for easy tracking of completness of all features, as well as general completness of the game.
+  git (we use git to track all the code for this project, each feature
+  in backlog gets a commit)
 \item
-  collision algorithms: Checking whether two objects intersect 
+  collision algorithms
 \end{itemize}
 
 \section{Player capability:}\label{player-capability}
 
 \begin{itemize}
 \tightlist
-\item[$\square$]
+\item[$\boxtimes$]
   Moving {[}user input{]}(stuff moves around the player; player always
   centered)
-\item[$\square$]
+\item[$\boxtimes$]
   Shooting (bullets appearing on screen and moving towards mouse
   position)
-\item[$\square$]
+\item[$\boxtimes$]
   track health (health counter on the screen)
-\item[$\square$]
+\item[$\boxtimes$]
   end game on no health (Game over when health = 0)
-\item[$\square$]
+\item[$\boxtimes$]
   Picking up items (items disappearing when player is on them)
-% \item[$\square$]
-%     Player sprite.
 \end{itemize}
 
 \section{Bullet capability:}\label{bullet-capability}
 
 \begin{itemize}
 \tightlist
-\item[$\square$]
+\item[$\boxtimes$]
   linear movement (moves on screen)
-\item[$\square$]
+\item[$\boxtimes$]
   hit enemy (bullet disappears on hit)
-\item[$\square$]
+\item[$\boxtimes$]
   deal damage to hit enemy (enemies die after some bullets)
-% \item[$\square$]
-%   Enemy sprite.
 \end{itemize}
 
 \section{Enemy capability}\label{enemy-capability}
 
 \begin{itemize}
 \tightlist
-\item[$\square$]
+\item[$\boxtimes$]
   random spawn around player {[}maybe in groups{]} (enemies appear on
   the screen)
-\item[$\square$]
+\item[$\boxtimes$]
   track player (go towards player on screen)
-\item[$\square$]
+\item[$\boxtimes$]
   attack player if in range (player takes damage if close enough)
-\item[$\square$]
+\item[$\boxtimes$]
   die on no health (disappear from screen)
-\item[$\square$]
+\item[$\boxtimes$]
   randomly drop item on death (item maybe appears after death)
-% \item[$\square$]
-%     bullet sprite
 \end{itemize}
 
 \section{General capability}\label{general-capability}
@@ -128,11 +116,11 @@ Group 13
 \tightlist
 \item[$\boxtimes$]
   draw things on screen (things can be seeen on screen)
-\item[$\square$]
+\item[$\boxtimes$]
   start game (player appears in the middle)
-\item[$\square$]
-  detect collision of objects (unit test passes): This item is linked to the topic of collision. 
-\item[$\square$]
+\item[$\boxtimes$]
+  detect collision of objects (unit test passes) (collision algorithms)
+\item[$\boxtimes$]
   restart game after end (same as start but after Game Over)
 \end{itemize}
 

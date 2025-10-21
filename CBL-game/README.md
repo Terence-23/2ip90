@@ -24,3 +24,4 @@ Below There is a list of all features and how they should be tested:
 | Upgrades | Upgrades dropped by enemies can be picked up. Upon pickup one of three things should happen: increase in speed, increase in damage or healing of the player (Health and damage are displayed in the top left corner). |
 | Game over and restart | When player dies (Health reduced to zero) the game should end (Big game over text on the screen). It is then possible to restart the game by pressing restart. |
 
+The github repo containing this project can be found [here](https://github.com/Terence-23/2ip90)

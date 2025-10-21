@@ -3,27 +3,27 @@
 - collision algorithms
 
 # Player capability:
-- [ ] Moving \[user input\](stuff moves around the player; player always centered)
-- [ ] Shooting (bullets appearing on screen and moving towards mouse position)
-- [ ] track health (health counter on the screen)
-- [ ] end game on no health (Game over when health = 0)
-- [ ] Picking up items (items disappearing when player is on them)
+- [x] Moving \[user input\](stuff moves around the player; player always centered)
+- [x] Shooting (bullets appearing on screen and moving towards mouse position)
+- [x] track health (health counter on the screen)
+- [x] end game on no health (Game over when health = 0)
+- [x] Picking up items (items disappearing when player is on them)
 
 # Bullet capability:
-- [ ] linear movement (moves on screen)
-- [ ] hit enemy (bullet disappears on hit)
-- [ ] deal damage to hit enemy (enemies die after some bullets)
+- [x] linear movement (moves on screen)
+- [x] hit enemy (bullet disappears on hit)
+- [x] deal damage to hit enemy (enemies die after some bullets)
 
 # Enemy capability
-- [ ] random spawn around player \[maybe in groups\] (enemies appear on the screen)
-- [ ] track player (go towards player on screen)
-- [ ] attack player if in range (player takes damage if close enough)
-- [ ] die on no health (disappear from screen)
-- [ ] randomly drop item on death (item maybe appears after death)
+- [x] random spawn around player \[maybe in groups\] (enemies appear on the screen)
+- [x] track player (go towards player on screen)
+- [x] attack player if in range (player takes damage if close enough)
+- [x] die on no health (disappear from screen)
+- [x] randomly drop item on death (item maybe appears after death)
 
 # General capability
  - [x] draw things on screen (things can be seeen on screen)
- - [ ] start game (player appears in the middle)
- - [ ] detect collision of objects (unit test passes) (collision algorithms)
- - [ ] restart game after end (same as start but after Game Over)
+ - [x] start game (player appears in the middle)
+ - [x] detect collision of objects (unit test passes) (collision algorithms)
+ - [x] restart game after end (same as start but after Game Over)
 

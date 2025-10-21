@@ -34,8 +34,11 @@ class Enemy implements GameObject {
 
     boolean facingRight = true; // === NEW ===
 
-    enum EnemyState { IDLE, WALK, ATTACK, DEAD } // === NEW ===
-    EnemyState currentState = EnemyState.IDLE;   // === NEW ===
+    enum EnemyState {
+        IDLE, WALK, ATTACK, DEAD
+    } // === NEW ===
+
+    EnemyState currentState = EnemyState.IDLE; // === NEW ===
 
     // === NEW: Animation system like Player.java ===
     Animation animLeft, animRight;
@@ -43,8 +46,8 @@ class Enemy implements GameObject {
     Animation attackLeft, attackRight;
     Animation deadLeft, deadRight;
     Animation currentAnim;
-    int frameWidth = 32;
-    int frameHeight = 32;
+    int frameWidth = 128;// 32;
+    int frameHeight = 128;// 32;
 
     Enemy(Vec2 pos) {
         this.pos = pos;
@@ -52,14 +55,15 @@ class Enemy implements GameObject {
 
     void loadAnimations() {
         try {
+            // System.out.println("load enemy anims");
             animLeft = new Animation(loadFrames("enemy_walk_left.png"), 150);
             animRight = new Animation(loadFrames("enemy_walk_right.png"), 150);
 
-            idleLeft = new Animation(loadFrames("enemy_idle_left.png"), 300);
-            idleRight = new Animation(loadFrames("enemy_idle_right.png"), 300);
-
             attackLeft = new Animation(loadFrames("enemy_attack_left.png"), 120);
             attackRight = new Animation(loadFrames("enemy_attack_right.png"), 120);
+
+            idleLeft = new Animation(loadFrames("enemy_idle_left.png"), 300);
+            idleRight = new Animation(loadFrames("enemy_idle_right.png"), 300);
 
             deadLeft = new Animation(loadFrames("enemy_dead_left.png"), 500);
             deadRight = new Animation(loadFrames("enemy_dead_right.png"), 500);
@@ -116,16 +120,17 @@ class Enemy implements GameObject {
     }
 
     // void damage(double damage) {
-    //     health -= damage;
-    //     if (health <= 0) {
-    //         // System.out.println("enemy dead");
-    //         GameRuntime.rt.remove(this);
-    //     }
-    //     // System.out.println("OUCH!!");
+    // health -= damage;
+    // if (health <= 0) {
+    // // System.out.println("enemy dead");
+    // GameRuntime.rt.remove(this);
+    // }
+    // // System.out.println("OUCH!!");
     // }
 
     void damage(double damage) {
-        if (currentState == EnemyState.DEAD) return;
+        if (currentState == EnemyState.DEAD)
+            return;
         health -= damage;
         if (health <= 0) {
             die();
@@ -136,6 +141,7 @@ class Enemy implements GameObject {
     void die() {
         currentState = EnemyState.DEAD;
         currentAnim = facingRight ? deadRight : deadLeft;
+        // Doesn't have to be invokeLater ASK
         SwingUtilities.invokeLater(() -> GameRuntime.rt.remove(this));
     }
 
@@ -148,6 +154,7 @@ class Enemy implements GameObject {
     public void setup() {
         var rt = GameRuntime.rt;
         rt.collisionLayers.get("Enemies").add(this.col);
+        loadAnimations();
     }
 
     /**
@@ -167,13 +174,17 @@ class Enemy implements GameObject {
     }
 
     void trackPlayer() {
-        if (currentState == EnemyState.DEAD) return;
+        if (currentState == EnemyState.DEAD)
+            return;
 
         var player = GameRuntime.rt.player;
         var offset = player.getPos().sub(getPos());
         var distance = offset.length();
 
-        if (distance < 0.01) return;
+        // not strictly necessary, lerp sets speed to zero if closer than minDistance
+        // ASK
+        if (distance < 0.01)
+            return;
 
         facingRight = offset.x >= 0; // === NEW ===
         var dir = offset.div(distance);
@@ -185,7 +196,8 @@ class Enemy implements GameObject {
     }
 
     void attackPlayer() {
-        if (currentState == EnemyState.DEAD) return;
+        if (currentState == EnemyState.DEAD)
+            return;
 
         timeSinceLastDamage += GameRuntime.rt.deltaTime;
         var player = GameRuntime.rt.player;
@@ -202,7 +214,8 @@ class Enemy implements GameObject {
     @Override
     public void update() {
         if (currentState == EnemyState.DEAD) {
-            if (currentAnim != null) currentAnim.update();
+            if (currentAnim != null)
+                currentAnim.update();
             return;
         }
 
@@ -210,16 +223,30 @@ class Enemy implements GameObject {
         attackPlayer();
 
         // Pick animation based on state
-        if (currentState == EnemyState.WALK)
+        if (currentState == EnemyState.WALK) {
+            // System.out.println("enemy walking");
             currentAnim = facingRight ? animRight : animLeft;
-        else if (currentState == EnemyState.ATTACK)
+            // if (currentAnim == null) {
+            // System.out.println("walking anim null");
+            // }
+        } else if (currentState == EnemyState.ATTACK) {
+            // System.out.println("enemy attacking");
             currentAnim = facingRight ? attackRight : attackLeft;
-        else
+            if (currentAnim == null) {
+                // System.out.println("attack anim null");
+            }
+        } else {
+            // System.out.println("enemy idling");
             currentAnim = facingRight ? idleRight : idleLeft;
+            if (currentAnim == null) {
+                // System.out.println("idle anim null");
+            }
+        }
 
-        if (currentAnim != null) currentAnim.update();
+        if (currentAnim != null)
+            currentAnim.update();
     }
-    
+
     @Override
     public void draw(Graphics g) {
         var rt = GameRuntime.rt;
@@ -231,12 +258,13 @@ class Enemy implements GameObject {
         Vec2 endPos = rt.map_space_to_screen(pos.add(CORNER_OFFSET));
 
         lastDraw = new Rectangle(
-            (int) startPos.x,
-            (int) startPos.y,
-            (int) endPos.x - (int) startPos.x,
-            (int) endPos.y - (int) startPos.y
-        );
+                (int) startPos.x,
+                (int) startPos.y,
+                (int) endPos.x - (int) startPos.x,
+                (int) endPos.y - (int) startPos.y);
 
+        // System.out.println("Current anim == null: %s".formatted(currentAnim == null ?
+        // "true" : "false"));
         if (currentAnim != null) {
             BufferedImage frame = currentAnim.getCurrentFrame();
             g.drawImage(frame, lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height, null);

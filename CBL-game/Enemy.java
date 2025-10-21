@@ -3,6 +3,12 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.Random;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.SwingUtilities;
+
 class Enemy implements GameObject {
     static double max_health = 50;
     Vec2 pos;
@@ -17,8 +23,65 @@ class Enemy implements GameObject {
     };
     Collider col = new Quad(size.mul(-0.5), new Vec2(size.x, 0), new Vec2(0, size.y), this);
 
+    final double speed = 4.5;
+    private static final double minDistance = 1;
+    private static final double slowDistance = 3;
+
+    final double damageVal = 10;
+    final double attack_range = 3;
+    double timeSinceLastDamage = 10;
+    double damageInterval = 2;
+
+    boolean facingRight = true; // === NEW ===
+
+    enum EnemyState {
+        IDLE, WALK, ATTACK, DEAD
+    } // === NEW ===
+
+    EnemyState currentState = EnemyState.IDLE; // === NEW ===
+
+    // === NEW: Animation system like Player.java ===
+    Animation animLeft, animRight;
+    Animation idleLeft, idleRight;
+    Animation attackLeft, attackRight;
+    Animation deadLeft, deadRight;
+    Animation currentAnim;
+    int frameWidth = 128;// 32;
+    int frameHeight = 128;// 32;
+
     Enemy(Vec2 pos) {
         this.pos = pos;
+    }
+
+    void loadAnimations() {
+        try {
+            // System.out.println("load enemy anims");
+            animLeft = new Animation(loadFrames("enemy_walk_left.png"), 150);
+            animRight = new Animation(loadFrames("enemy_walk_right.png"), 150);
+
+            attackLeft = new Animation(loadFrames("enemy_attack_left.png"), 120);
+            attackRight = new Animation(loadFrames("enemy_attack_right.png"), 120);
+
+            idleLeft = new Animation(loadFrames("enemy_idle_left.png"), 300);
+            idleRight = new Animation(loadFrames("enemy_idle_right.png"), 300);
+
+            deadLeft = new Animation(loadFrames("enemy_dead_left.png"), 500);
+            deadRight = new Animation(loadFrames("enemy_dead_right.png"), 500);
+
+            currentAnim = idleRight; // default facing right
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    BufferedImage[] loadFrames(String path) throws IOException {
+        BufferedImage sheet = ImageIO.read(new File(path));
+        int frameCount = sheet.getWidth() / frameWidth;
+        BufferedImage[] frames = new BufferedImage[frameCount];
+        for (int i = 0; i < frameCount; i++) {
+            frames[i] = sheet.getSubimage(i * frameWidth, 0, frameWidth, frameHeight);
+        }
+        return frames;
     }
 
     @Override
@@ -56,13 +119,30 @@ class Enemy implements GameObject {
         }
     }
 
+    // void damage(double damage) {
+    // health -= damage;
+    // if (health <= 0) {
+    // // System.out.println("enemy dead");
+    // GameRuntime.rt.remove(this);
+    // }
+    // // System.out.println("OUCH!!");
+    // }
+
     void damage(double damage) {
+        if (currentState == EnemyState.DEAD)
+            return;
         health -= damage;
         if (health <= 0) {
-            // System.out.println("enemy dead");
-            GameRuntime.rt.remove(this);
+            die();
         }
-        // System.out.println("OUCH!!");
+    }
+
+    // === NEW ===
+    void die() {
+        currentState = EnemyState.DEAD;
+        currentAnim = facingRight ? deadRight : deadLeft;
+        // Doesn't have to be invokeLater ASK
+        SwingUtilities.invokeLater(() -> GameRuntime.rt.remove(this));
     }
 
     @Override
@@ -74,32 +154,8 @@ class Enemy implements GameObject {
     public void setup() {
         var rt = GameRuntime.rt;
         rt.collisionLayers.get("Enemies").add(this.col);
+        loadAnimations();
     }
-
-    @Override
-    public void draw(Graphics g) {
-        var rt = GameRuntime.rt;
-        final var CORNER_OFFSET = size.mul(0.5);
-        if (lastDraw != null) {
-            g.clearRect(lastDraw.x - 1, lastDraw.y - 1, lastDraw.width + 2, lastDraw.height + 2);
-        }
-
-        Vec2 startPos = rt.map_space_to_screen(pos.sub(CORNER_OFFSET));
-        Vec2 endPos = rt.map_space_to_screen(pos.add(CORNER_OFFSET));
-        lastDraw = new Rectangle(
-                (int) startPos.x,
-                (int) startPos.y,
-                (int) endPos.x - (int) startPos.x,
-                (int) endPos.y - (int) startPos.y);
-        g.setColor(Color.red);
-        g.fillRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
-        g.setColor(Color.black);
-        g.drawRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
-    }
-
-    final double speed = 4.5;
-    private static final double minDistance = 1;
-    private static final double slowDistance = 3;
 
     /**
      * Linearly interpolates position between min and max.
@@ -118,28 +174,38 @@ class Enemy implements GameObject {
     }
 
     void trackPlayer() {
+        if (currentState == EnemyState.DEAD)
+            return;
+
         var player = GameRuntime.rt.player;
         var offset = player.getPos().sub(getPos());
         var distance = offset.length();
-        var dir = offset.div(distance);
 
+        // not strictly necessary, lerp sets speed to zero if closer than minDistance
+        // ASK
+        if (distance < 0.01)
+            return;
+
+        facingRight = offset.x >= 0; // === NEW ===
+        var dir = offset.div(distance);
         var specificSpeed = lerp(minDistance, slowDistance, distance, speed);
         var velocity = dir.mul(specificSpeed);
-
         this.pos = this.pos.add(velocity.mul(GameRuntime.rt.deltaTime));
+
+        currentState = EnemyState.WALK; // === NEW ===
     }
 
-    final double damageVal = 10;
-    final double attack_range = 3;
-    double timeSinceLastDamage = 10;
-    double damageInterval = 2;
-
     void attackPlayer() {
+        if (currentState == EnemyState.DEAD)
+            return;
+
         timeSinceLastDamage += GameRuntime.rt.deltaTime;
         var player = GameRuntime.rt.player;
         var offset = player.getPos().sub(getPos());
         var distance = offset.length();
+
         if (distance <= attack_range && timeSinceLastDamage > damageInterval) {
+            currentState = EnemyState.ATTACK;
             player.damage(damageVal);
             timeSinceLastDamage = 0;
         }
@@ -147,7 +213,67 @@ class Enemy implements GameObject {
 
     @Override
     public void update() {
+        if (currentState == EnemyState.DEAD) {
+            if (currentAnim != null)
+                currentAnim.update();
+            return;
+        }
+
         trackPlayer();
         attackPlayer();
+
+        // Pick animation based on state
+        if (currentState == EnemyState.WALK) {
+            // System.out.println("enemy walking");
+            currentAnim = facingRight ? animRight : animLeft;
+            // if (currentAnim == null) {
+            // System.out.println("walking anim null");
+            // }
+        } else if (currentState == EnemyState.ATTACK) {
+            // System.out.println("enemy attacking");
+            currentAnim = facingRight ? attackRight : attackLeft;
+            if (currentAnim == null) {
+                // System.out.println("attack anim null");
+            }
+        } else {
+            // System.out.println("enemy idling");
+            currentAnim = facingRight ? idleRight : idleLeft;
+            if (currentAnim == null) {
+                // System.out.println("idle anim null");
+            }
+        }
+
+        if (currentAnim != null)
+            currentAnim.update();
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        var rt = GameRuntime.rt;
+        final var CORNER_OFFSET = size.mul(0.5);
+        if (lastDraw != null)
+            g.clearRect(lastDraw.x - 1, lastDraw.y - 1, lastDraw.width + 2, lastDraw.height + 2);
+
+        Vec2 startPos = rt.map_space_to_screen(pos.sub(CORNER_OFFSET));
+        Vec2 endPos = rt.map_space_to_screen(pos.add(CORNER_OFFSET));
+
+        lastDraw = new Rectangle(
+                (int) startPos.x,
+                (int) startPos.y,
+                (int) endPos.x - (int) startPos.x,
+                (int) endPos.y - (int) startPos.y);
+
+        // System.out.println("Current anim == null: %s".formatted(currentAnim == null ?
+        // "true" : "false"));
+        if (currentAnim != null) {
+            BufferedImage frame = currentAnim.getCurrentFrame();
+            g.drawImage(frame, lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height, null);
+        } else {
+            // fallback if animation missing
+            g.setColor(Color.red);
+            g.fillRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
+            g.setColor(Color.black);
+            g.drawRect(lastDraw.x, lastDraw.y, lastDraw.width, lastDraw.height);
+        }
     }
 }

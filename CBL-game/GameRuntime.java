@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 /**
@@ -212,6 +213,10 @@ public class GameRuntime {
 
     public static void main(String[] args) {
         GameRuntime.rt = new GameRuntime();
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+        }
         rt.collisionLayers.put("Enemies", new CollisionLayer());
         Input input = new Input();
         rt.canvas.addMouseListener(input);

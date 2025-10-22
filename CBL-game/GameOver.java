@@ -32,6 +32,8 @@ class GameOver extends JPanel {
         var button = new JButton("Restart");
         button.setBackground(Color.black);
         button.setForeground(Color.white);
+        button.setOpaque(true);
+        button.setContentAreaFilled(true);
         button.addActionListener(new ActionListener() {
 
             @Override

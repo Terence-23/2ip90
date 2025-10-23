@@ -4,7 +4,11 @@
 
 # Running
 ## Linux / MacOs
-Run the `game.sh` script in the root directory of the game. It should do everything on its own. (Note that Wayland is not supported by Swing and in conscequence incompatible with this game)
+Make the file `game.sh` executable by running 
+```sh
+chmod a+x game.sh
+```
+And then run the `game.sh` script in the root directory of the game. It should do everything on its own. (Note that Wayland is not supported by Swing and in conscequence incompatible with this game)
 
 ## Windows
 Run the `game.bat` script in the root directory of the game. (Note that if running in powershell you may need to set the execution policy [more info here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7.5))

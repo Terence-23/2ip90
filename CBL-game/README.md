@@ -24,4 +24,17 @@ Below There is a list of all features and how they should be tested:
 | Upgrades | Upgrades dropped by enemies can be picked up. Upon pickup one of three things should happen: increase in speed, increase in damage or healing of the player (Health and damage are displayed in the top left corner). |
 | Game over and restart | When player dies (Health reduced to zero) the game should end (Big game over text on the screen). It is then possible to restart the game by pressing restart. |
 
+
+# Sources:
+## Collision:
+For the collision detection we used modified formulas found in the [_Ray Tracing In One Weekend_](https://raytracing.github.io/) book series. Specifically:
+
+- [This section for circle-line collision](https://raytracing.github.io/books/RayTracingInOneWeekend.html#addingasphere/ray-sphereintersection)
+- [this section for checking whether a point is within the quadrilateral](https://raytracing.github.io/books/RayTracingTheNextWeek.html#quadrilaterals/derivingtheplanarcoordinates)
+
+Additional formulas were created by us using the knowledge of vector mathematics from the calculus course and the framework from Ray Tracing In One Weekend. From this point it should be easy to design a method to detect intersection of any two arbitrary mathematical curves.
+
+## Git:
+We had basic knowledge of git from previous projects and extended it using manpages for git and its subcommands. They can be found [here](https://man.archlinux.org/man/git.1).
+
 The github repo containing this project can be found [here](https://github.com/Terence-23/2ip90)
